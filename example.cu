@@ -57,12 +57,10 @@ class device_mgr {
             gpuErrchk(cudaMemset(d_out,0,sz));
             gpuErrchk(cudaDeviceSynchronize());
             gpuErrchk(cudaPeekAtLastError());
-            stop = std::chrono::high_resolution_clock::now();
-            start = std::chrono::high_resolution_clock::now();
         }
         ~device_mgr(){cudaFree(this->d_out);}
         void sum_rays(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, uint32_t iter, uint32_t n_iter){
-            if(i == 0){
+            if(iter == 0){
                 start = std::chrono::high_resolution_clock::now();
             }
             
@@ -88,9 +86,7 @@ class device_mgr {
                 logfile<<"runtime (usec): "<<delta<<std::endl;
                 logfile<<"avg (usec): "<<delta/n_iter<<std::endl;
                 logfile.close();    
-            }
-
-        
+            }        
         }
         void setVec(py::array_t<float> vec_){vec = vec_;}
         py::array_t<float> getVec(){return vec;}

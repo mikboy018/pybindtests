@@ -1,15 +1,16 @@
 import example
 import numpy as np
 
-def printvals(vec):
+def printvals(vec,iter):
+    print("iter: ",iter)
     for i in range(0,len(vec)):
         print(vec[i])
 
-def loop(n_iter,n,threads,blocks,first,sec):
-    vec = np.ones(n)
+def loop(n_iter,n,threads,blocks,first,sec,devdata):
+    
     for i in range(0,n_iter):
-        vec = example.sum_rays(threads,blocks,first,sec,n,vec)
-        printvals(vec)
+        devdata.sum_rays(threads,blocks,first,sec,n,i)
+        printvals(devdata.getVec(),i)
 
 
 if __name__ == '__main__':
@@ -27,12 +28,15 @@ if __name__ == '__main__':
     print(p.age)
     print(p)
     
-    n_iter = 24
-    n = 42000
+    n_iter = 1900
+    n = 1500
     threads = 1024
     blocks = 32
     firstVal = 1.0
     secondVal = 2.0
+    vec = np.ones(n)
+    devdata = example.device_mgr(n)
+    devdata.setVec(vec)
 
-    loop(n_iter,n,threads,blocks,firstVal,secondVal)
+    loop(n_iter,n,threads,blocks,firstVal,secondVal,devdata)
     

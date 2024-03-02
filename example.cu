@@ -48,31 +48,46 @@ __global__ void cuda_add_ray(float * d_out,float i, float j, uint32_t n){
     }
 }
 
-py::array_t<float> sum_rays(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, py::array_t<float> vec){
-    auto start = std::chrono::high_resolution_clock::now();
-    float* d_out,*h_out;
-    py::buffer_info host_data = vec.request();
-    size_t sz = n*sizeof(float);
-    gpuErrchk(cudaMalloc((void**)&d_out,sz));
-    //h_out = (float*)malloc(sz);
-    h_out = reinterpret_cast<float*>(host_data.ptr);
-    gpuErrchk(cudaMemcpy(d_out,h_out,sz,cudaMemcpyHostToDevice));
-    gpuErrchk(cudaDeviceSynchronize());
-    gpuErrchk(cudaPeekAtLastError());
-    cuda_add_ray<<<threads,blocks>>>(d_out,i,j,n);
-    gpuErrchk(cudaDeviceSynchronize());
-    gpuErrchk(cudaPeekAtLastError());
-    gpuErrchk(cudaMemcpy(h_out,d_out,sz,cudaMemcpyDeviceToHost));
-    gpuErrchk(cudaDeviceSynchronize());
-    gpuErrchk(cudaPeekAtLastError());
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto delta = stop-start;
-    std::ofstream logfile;
-    logfile.open("test.log",std::ios::app);
-    logfile<<"runtime (usec): "<<std::chrono::duration_cast<std::chrono::microseconds>(delta).count()<<std::endl;
-    logfile.close();
-    return vec;
-}
+
+class device_mgr {
+    public:
+        device_mgr(const uint32_t n){
+            sz=sizeof(float)*n;
+            gpuErrchk(cudaMalloc((void**)&d_out,sz));
+            gpuErrchk(cudaMemset(d_out,0,sz));
+            gpuErrchk(cudaDeviceSynchronize());
+            gpuErrchk(cudaPeekAtLastError());
+        }
+        ~device_mgr(){cudaFree(this->d_out);}
+        void sum_rays(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, uint32_t iter){
+            auto start = std::chrono::high_resolution_clock::now();
+            py::buffer_info host_data = vec.request();
+            //h_out = (float*)malloc(sz);
+            h_out = reinterpret_cast<float*>(host_data.ptr);
+            //gpuErrchk(cudaMemcpy(d_out,h_out,sz,cudaMemcpyHostToDevice));
+            //gpuErrchk(cudaDeviceSynchronize());
+            //gpuErrchk(cudaPeekAtLastError());
+            cuda_add_ray<<<threads,blocks>>>(d_out,i,j,n);
+            gpuErrchk(cudaDeviceSynchronize());
+            gpuErrchk(cudaPeekAtLastError());
+            gpuErrchk(cudaMemcpy(h_out,d_out,sz,cudaMemcpyDeviceToHost));
+            gpuErrchk(cudaDeviceSynchronize());
+            gpuErrchk(cudaPeekAtLastError());
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto delta = stop-start;
+            std::ofstream logfile;
+            logfile.open("test.log",std::ios::app);
+            logfile<<"runtime (usec): "<<std::chrono::duration_cast<std::chrono::microseconds>(delta).count()<<std::endl;
+            logfile.close();            
+        }
+        void setVec(py::array_t<float> vec_){vec = vec_;}
+        py::array_t<float> getVec(){return vec;}
+        float * d_out; // Device-side data
+        float * h_out; // Host-side data
+        size_t sz; // size of data
+        py::array_t<float> vec;
+};
+
 
 
 PYBIND11_MODULE(example, m) {
@@ -98,7 +113,10 @@ PYBIND11_MODULE(example, m) {
             })
         .def_readwrite("age",&Pet::age);
 
-    // Arrays w/CUDA
-    m.def("sum_rays",&sum_rays,"add two arrays (floats)");
+    py::class_<device_mgr>(m,"device_mgr")
+        .def(py::init<const uint32_t &>())
+        .def("sum_rays",&device_mgr::sum_rays)
+        .def("getVec",&device_mgr::getVec)
+        .def("setVec",&device_mgr::setVec);
     
 }

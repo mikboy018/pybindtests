@@ -9,8 +9,8 @@ def printvals(vec,iter):
 def loop(n_iter,n,threads,blocks,first,sec,devdata):
     
     for i in range(0,n_iter):
-        devdata.sum_rays(threads,blocks,first,sec,n,i)
-        printvals(devdata.getVec(),i)
+        devdata.sum_rays(threads,blocks,first,sec,n,i,n_iter)
+        #printvals(devdata.getVec(),i)
 
 
 if __name__ == '__main__':
@@ -30,8 +30,8 @@ if __name__ == '__main__':
     
     n_iter = 1900
     n = 1500
-    threads = 1024
-    blocks = 32
+    threads = 256
+    blocks = 8
     firstVal = 1.0
     secondVal = 2.0
     vec = np.ones(n)

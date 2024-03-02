@@ -57,10 +57,15 @@ class device_mgr {
             gpuErrchk(cudaMemset(d_out,0,sz));
             gpuErrchk(cudaDeviceSynchronize());
             gpuErrchk(cudaPeekAtLastError());
+            stop = std::chrono::high_resolution_clock::now();
+            start = std::chrono::high_resolution_clock::now();
         }
         ~device_mgr(){cudaFree(this->d_out);}
-        void sum_rays(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, uint32_t iter){
-            auto start = std::chrono::high_resolution_clock::now();
+        void sum_rays(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, uint32_t iter, uint32_t n_iter){
+            if(i == 0){
+                start = std::chrono::high_resolution_clock::now();
+            }
+            
             py::buffer_info host_data = vec.request();
             //h_out = (float*)malloc(sz);
             h_out = reinterpret_cast<float*>(host_data.ptr);
@@ -73,12 +78,19 @@ class device_mgr {
             gpuErrchk(cudaMemcpy(h_out,d_out,sz,cudaMemcpyDeviceToHost));
             gpuErrchk(cudaDeviceSynchronize());
             gpuErrchk(cudaPeekAtLastError());
-            auto stop = std::chrono::high_resolution_clock::now();
-            auto delta = stop-start;
-            std::ofstream logfile;
-            logfile.open("test.log",std::ios::app);
-            logfile<<"runtime (usec): "<<std::chrono::duration_cast<std::chrono::microseconds>(delta).count()<<std::endl;
-            logfile.close();            
+
+            
+            if(iter == n_iter-1){
+                stop = std::chrono::high_resolution_clock::now();
+                auto delta = std::chrono::duration_cast<std::chrono::microseconds>(stop-start).count();
+                
+                logfile.open("test.log");
+                logfile<<"runtime (usec): "<<delta<<std::endl;
+                logfile<<"avg (usec): "<<delta/n_iter<<std::endl;
+                logfile.close();    
+            }
+
+        
         }
         void setVec(py::array_t<float> vec_){vec = vec_;}
         py::array_t<float> getVec(){return vec;}
@@ -86,6 +98,9 @@ class device_mgr {
         float * h_out; // Host-side data
         size_t sz; // size of data
         py::array_t<float> vec;
+        std::ofstream logfile;
+        std::chrono::_V2::system_clock::time_point start;
+        std::chrono::_V2::system_clock::time_point stop;
 };
 
 

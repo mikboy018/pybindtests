@@ -5,6 +5,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/iostream.h>
+#include <chrono>
 
 namespace py = pybind11;
 
@@ -14,7 +15,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    if (code != cudaSuccess) 
    {
       std::ofstream logfile;
-      logfile.open("test.log");
+      logfile.open("err.log");
       logfile<<"GPUassert: "<< cudaGetErrorString(code)<< file<< line<< std::endl;
       logfile.close();
       if (abort) exit(code);
@@ -43,11 +44,12 @@ __global__ void cuda_add_ray(float * d_out,float i, float j, uint32_t n){
     uint32_t stride = blockDim.x * gridDim.x;
 
     for(uint32_t x = global_thread; x < n; x += stride){
-        d_out[x] += i + j;
+        d_out[x] += i + j + x;
     }
 }
 
 py::array_t<float> sum_rays(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, py::array_t<float> vec){
+    auto start = std::chrono::high_resolution_clock::now();
     float* d_out,*h_out;
     py::buffer_info host_data = vec.request();
     size_t sz = n*sizeof(float);
@@ -63,7 +65,12 @@ py::array_t<float> sum_rays(uint32_t threads, uint32_t blocks, float i, float j,
     gpuErrchk(cudaMemcpy(h_out,d_out,sz,cudaMemcpyDeviceToHost));
     gpuErrchk(cudaDeviceSynchronize());
     gpuErrchk(cudaPeekAtLastError());
-
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto delta = stop-start;
+    std::ofstream logfile;
+    logfile.open("test.log",std::ios::app);
+    logfile<<"runtime (usec): "<<std::chrono::duration_cast<std::chrono::microseconds>(delta).count()<<std::endl;
+    logfile.close();
     return vec;
 }
 

@@ -1,6 +1,16 @@
 import example
 import numpy as np
 
+def printvals(vec):
+    for i in range(0,len(vec)):
+        print(vec[i])
+
+def loop(n_iter,n,threads,blocks,first,sec):
+    vec = np.ones(n)
+    for i in range(0,n_iter):
+        vec = example.sum_rays(threads,blocks,first,sec,n,vec)
+        printvals(vec)
+
 
 if __name__ == '__main__':
     print(example.add(1,2))
@@ -17,30 +27,12 @@ if __name__ == '__main__':
     print(p.age)
     print(p)
     
-    n = 16
-    threads = 32
-    blocks = 1
+    n_iter = 24
+    n = 42000
+    threads = 1024
+    blocks = 32
     firstVal = 1.0
     secondVal = 2.0
-    thirdVal = 1.25
-    fourthVal = 1.5
 
-    vec = np.ones(16,dtype=float)
-
-    vals = example.sum_rays(threads,blocks,firstVal,secondVal,n,vec)
-
-    print("vec")
-    for i in range(0,n):
-        print(vec[i])
-
-
-    print("vals")
-    for i in range(0,n):
-        print(vals[i])
-    
-    
-    vals2 = example.sum_rays(threads,blocks,thirdVal,fourthVal,n,vals) 
-    print("vals2")
-    for i in range(0,n):
-        print(vals2[i])
+    loop(n_iter,n,threads,blocks,firstVal,secondVal)
     

@@ -38,7 +38,9 @@ PYBIND11_MODULE(example, m) {
     
 }
 
-device_mgr::device_mgr(){printf("device mgr!\n");}
+device_mgr::device_mgr(){
+    printf("device mgr is alive!\n");
+}
 
 device_mgr::device_mgr(const uint32_t n){
     printf("init setup\n");

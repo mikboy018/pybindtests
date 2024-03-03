@@ -28,7 +28,7 @@ if __name__ == '__main__':
     print(p.age)
     print(p)
     
-    n_iter = 1900
+    n_iter = 20
     n = 1500
     threads = 256
     blocks = 8

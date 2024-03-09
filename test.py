@@ -1,5 +1,6 @@
 import example
 import numpy as np
+import sys
 
 def printvals(vec,iter):
     print("iter: ",iter)
@@ -12,6 +13,22 @@ def loop(n_iter,n,threads,blocks,first,sec,devdata):
         devdata.sum_rays(threads,blocks,first,sec,n,i,n_iter)
         #printvals(devdata.getVec(),i)
 
+def load_args(argv)->dict:
+    args = {}
+    args["n"] = 1500
+    args["n_iter"] = 20
+    args["threads"] = 256
+    args["blocks"] = 8
+    args["firstVal"] = 1.0
+    args["secondVal"] = 2.0
+
+    for a in range(1,len(argv)):
+        if a in ["n","n_iter","threads","blocks"]:
+            args[a] = int(args[a+1])
+            a += 1
+        elif a in  ["firstVal","secondVal"]:
+            args[a] = float(args[a+1])
+    return args
 
 if __name__ == '__main__':
     print(example.add(1,2))
@@ -28,15 +45,10 @@ if __name__ == '__main__':
     print(p.age)
     print(p)
     
-    n_iter = 1900
-    n = 1500
-    threads = 256
-    blocks = 8
-    firstVal = 1.0
-    secondVal = 2.0
-    vec = np.ones(n)
-    devdata = example.device_mgr(n)
+    args = load_args(sys.argv)
+    vec = np.ones(args["n"])
+    devdata = example.device_mgr(args["n"])
     devdata.setVec(vec)
 
-    loop(n_iter,n,threads,blocks,firstVal,secondVal,devdata)
+    loop(args["n_iter"],args["n"],args["threads"],args["blocks"],args["firstVal"],args["secondVal"],devdata)
     

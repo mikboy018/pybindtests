@@ -1,4 +1,4 @@
-import example
+import lib.example as example
 import numpy as np
 import sys
 

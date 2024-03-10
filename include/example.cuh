@@ -31,6 +31,7 @@ struct args {
     float firstVal;
     float secondVal;
     py::array_t<float> vec;
+    LAUNCH_TYPE ltype;
 };
 
 int add(int i, int j);

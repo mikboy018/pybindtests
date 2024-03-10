@@ -15,6 +15,13 @@ device_mgr::device_mgr(const uint32_t n,LAUNCH_TYPE l_){
     gpuErrchk(cudaPeekAtLastError());
     printf("device mgr setup\n");
     this->l = l_;
+    if(this->l == LAUNCH_TYPE::DEFAULT){
+        printf("Normal Graph Launches\n");
+    } else if(this->l == LAUNCH_TYPE::H_GRAPH){
+        printf("Host Launched Graphs\n");
+    } else if(this->l == LAUNCH_TYPE::D_GRAPH){
+        printf("Device Launched Graphs\n");
+    }
 }
 
 device_mgr::~device_mgr(){

@@ -25,8 +25,8 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 
 enum LAUNCH_TYPE {
     DEFAULT=0,
-    H_GRAPH,
-    D_GRAPH
+    H_GRAPH=1,
+    D_GRAPH=2
 };
 
 #endif

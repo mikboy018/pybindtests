@@ -31,6 +31,15 @@ args load_args(int argc, char * argv[]){
         }else if(strcmp(argv[i],"secondVal")==0){
             a.secondVal = std::stof(argv[i+1]);
             ++i;
+        }else if(strcmp(argv[i],"launchType")==0){
+            ++i;
+            if(strcmp(argv[i],"DEFAULT")==0){
+                a.ltype = DEFAULT;
+            }else if(strcmp(argv[i],"H_GRAPH")==0){
+                a.ltype = H_GRAPH;
+            }else if(strcmp(argv[i],"D_GRAPH")==0){
+                a.ltype = D_GRAPH;
+            }
         }
     }
 
@@ -46,9 +55,7 @@ int main(int argc, char * argv[]){
     
     printf("sum 1+2=%i\n",add(1,2));
     
-    LAUNCH_TYPE ltype = DEFAULT;
-    
-    device_mgr d_m(a.n,ltype);
+    device_mgr d_m(a.n,a.ltype);
     a.vec = py::array_t<float>(d_m.sz);
     d_m.vec = a.vec;
 

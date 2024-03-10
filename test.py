@@ -7,7 +7,7 @@ def printvals(vec,iter):
     for i in range(0,len(vec)):
         print(vec[i])
 
-def loop(n_iter,n,threads,blocks,first,sec,devdata):
+def loop(n_iter,n,threads,blocks,first,sec,devdata,type):
     
     for i in range(0,n_iter):
         devdata.sum_rays(threads,blocks,first,sec,n,i,n_iter)
@@ -47,8 +47,8 @@ if __name__ == '__main__':
     
     args = load_args(sys.argv)
     vec = np.ones(args["n"])
-    devdata = example.device_mgr(args["n"])
+    devdata = example.device_mgr(args["n"],example.DEFAULT)
     devdata.setVec(vec)
 
-    loop(args["n_iter"],args["n"],args["threads"],args["blocks"],args["firstVal"],args["secondVal"],devdata)
+    loop(args["n_iter"],args["n"],args["threads"],args["blocks"],args["firstVal"],args["secondVal"],devdata,devdata)
     

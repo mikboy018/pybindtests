@@ -3,16 +3,6 @@
 
 namespace py = pybind11;
 
-struct args {
-    uint32_t n_iter;
-    uint32_t n;
-    uint32_t threads;
-    uint32_t blocks;
-    float firstVal;
-    float secondVal;
-    py::array_t<float> vec;
-};
-
 args load_args(int argc, char * argv[]){
     args a;
     a.n_iter = 20;
@@ -56,14 +46,17 @@ int main(int argc, char * argv[]){
     
     printf("sum 1+2=%i\n",add(1,2));
     
-    device_mgr d_m(a.n);
+    LAUNCH_TYPE ltype = DEFAULT;
+    
+    device_mgr d_m(a.n,ltype);
     a.vec = py::array_t<float>(d_m.sz);
     d_m.vec = a.vec;
 
+    
+
     cudaSetDevice(0);
 
-
-    for(int i = 0; i < 40; ++i){
+    for(int i = 0; i < a.n_iter; ++i){
         d_m.sum_rays(a.threads,a.blocks,a.firstVal,a.secondVal,a.n,i,a.n_iter);
     }
 

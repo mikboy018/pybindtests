@@ -32,7 +32,7 @@ PYBIND11_MODULE(example, m) {
 
     py::class_<device_mgr>(m,"device_mgr")
         .def(py::init<const uint32_t &,LAUNCH_TYPE &>())
-        .def("sum_rays",&device_mgr::sum_rays)
+        .def("ray_ops",&device_mgr::ray_ops)
         .def("getVec",&device_mgr::getVec)
         .def("setVec",&device_mgr::setVec)
         .def_readwrite("l",&device_mgr::l);

@@ -13,6 +13,8 @@ void launcher::launch_normal(py::array_t<float> vec, float * h_out, float * d_ou
     //gpuErrchk(cudaDeviceSynchronize());
     //gpuErrchk(cudaPeekAtLastError());
     cuda_add_ray<<<threads,blocks>>>(d_out,i,j,n);
+    cuda_mult_ray<<<threads,blocks>>>(d_out,j,n);
+    cuda_sin_ray<<<threads,blocks>>>(d_out,n);
     gpuErrchk(cudaDeviceSynchronize());
     gpuErrchk(cudaPeekAtLastError());
     //gpuErrchk(cudaMemcpy(h_out,d_out,sz,cudaMemcpyDeviceToHost));
@@ -26,8 +28,8 @@ void launcher::launch_normal(py::array_t<float> vec, float * h_out, float * d_ou
         this->logfile.open("test.log");
         this->logfile<<"runtime (usec): "<<delta<<std::endl;
         this->logfile<<"avg (usec): "<<delta/n_iter<<std::endl;
-        this->logfile.close();    
-        printf("\n");
+        this->logfile.close();
+        printf("\nperformance logging complete\n");    
     }     
 
 }

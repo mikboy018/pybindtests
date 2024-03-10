@@ -21,6 +21,9 @@ device_mgr::device_mgr(const uint32_t n,LAUNCH_TYPE l_){
         printf("Host Launched Graphs\n");
     } else if(this->l == LAUNCH_TYPE::D_GRAPH){
         printf("Device Launched Graphs\n");
+    } else {
+        std::cerr<<"[ERROR]: Must specify graph\n"<<std::endl;
+        exit(1);
     }
 }
 
@@ -28,7 +31,7 @@ device_mgr::~device_mgr(){
     gpuErrchk(cudaFree(this->d_out));
 }
 
-void device_mgr::sum_rays(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, uint32_t iter, uint32_t n_iter){
+void device_mgr::ray_ops(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, uint32_t iter, uint32_t n_iter){
     switch(this->l){
         case DEFAULT:
             kl.launch_normal(this->vec, this->h_out, this->d_out, threads, blocks, i, j, n, iter, n_iter);

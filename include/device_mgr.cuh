@@ -24,7 +24,7 @@ class device_mgr {
     device_mgr();
     device_mgr(const uint32_t n, LAUNCH_TYPE l_);
     ~device_mgr();
-    void sum_rays(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, uint32_t iter, uint32_t n_iter);     
+    void ray_ops(uint32_t threads, uint32_t blocks, float i, float j, uint32_t n, uint32_t iter, uint32_t n_iter);     
     void setVec(py::array_t<float> vec_);
     py::array_t<float> getVec();
     py::array_t<float> vec;

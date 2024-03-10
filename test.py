@@ -10,7 +10,7 @@ def printvals(vec,iter):
 def loop(n_iter,n,threads,blocks,first,sec,devdata,type):
     
     for i in range(0,n_iter):
-        devdata.sum_rays(threads,blocks,first,sec,n,i,n_iter)
+        devdata.ray_ops(threads,blocks,first,sec,n,i,n_iter)
         #printvals(devdata.getVec(),i)
 
 def load_args(argv)->dict:

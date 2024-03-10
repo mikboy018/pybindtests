@@ -11,6 +11,7 @@ args load_args(int argc, char * argv[]){
     a.blocks = 8;
     a.firstVal = 1.0f;
     a.secondVal = 1.0f;
+    a.ltype = DEFAULT;
     for(uint32_t i = 0; i < argc; ++i){
         printf("%s\n",argv[i]);
         if(strcmp(argv[i],"n_iter")==0){
@@ -59,12 +60,10 @@ int main(int argc, char * argv[]){
     a.vec = py::array_t<float>(d_m.sz);
     d_m.vec = a.vec;
 
-    
-
     cudaSetDevice(0);
 
     for(int i = 0; i < a.n_iter; ++i){
-        d_m.sum_rays(a.threads,a.blocks,a.firstVal,a.secondVal,a.n,i,a.n_iter);
+        d_m.ray_ops(a.threads,a.blocks,a.firstVal,a.secondVal,a.n,i,a.n_iter);
     }
 
     return 0;

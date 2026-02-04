@@ -4,26 +4,18 @@
 
 namespace py = pybind11;
 
-
-
 int main(int argc, char * argv[]){
-    printf("hi earth\n");
     py::scoped_interpreter guard{}; // Now we can call device mgr with python extensions
 
     args a = load_args(argc,argv);
-    
-    
-    printf("sum 1+2=%i\n",add(1,2));
-    
-    device_mgr d_m(a.n,a.ltype);
-    a.vec = py::array_t<float>(d_m.sz);
-    d_m.vec = a.vec;
+       
+    device_mgr d_m(a.n,a.ltype,a.threads,a.blocks,a.firstVal,a.secondVal,a.n_iter,a.logfile);
 
-    cudaSetDevice(0);
+    d_m.ray_ops();
 
-    for(int i = 0; i < a.n_iter; ++i){
-        d_m.ray_ops(a.threads,a.blocks,a.firstVal,a.secondVal,a.n,i,a.n_iter);
+    for(uint32_t i = 0; i < a.n; ++i){
+        printf("%u: %8.8f\t",i,d_m.h_out[i]);
     }
-
+    printf("\n");
     return 0;
 }

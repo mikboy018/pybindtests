@@ -14,15 +14,6 @@
 
 namespace py = pybind11;
 
-struct Pet {
-    Pet(const std::string &name) : name(name),age(0) {}
-    void setName(const std::string &name_) { name = name_;}
-    const std::string &getName() const {return name;}
-
-    std::string name;
-    int age;
-};
-
 struct args {
     uint32_t n_iter;
     uint32_t n;
@@ -32,11 +23,10 @@ struct args {
     float secondVal;
     py::array_t<float> vec;
     LAUNCH_TYPE ltype;
+    std::string logfile;
+    void print(){
+        printf("n_iter: %u, n: %u, threads: %u, blocks: %u, firstVal: %8.4f, secondVal: %8.4f\n",n_iter,n,threads,blocks,firstVal,secondVal);
+    }
 };
-
-int add(int i, int j);
-int multiply(int i, int j);
-
-
 
 #endif

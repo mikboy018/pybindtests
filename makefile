@@ -1,10 +1,13 @@
 
-NVCC ?= /usr/local/cuda/bin/nvcc
+NVCC?=/usr/local/cuda/bin/nvcc
+COMPUTE_CAPABILITY?=80
 NVCC_SHR_OUT = $(shell python3-config --extension-suffix)
-NVCC_SHR_OPTS = -gencode arch=compute_80,code=sm_80 -shared -O3 -std=c++11 --compiler-options -fPIC $(shell python3 -m pybind11 --includes) 
-NVCC_OPTS = -gencode arch=compute_80,code=sm_80 -O3 -std=c++11 --compiler-options -fPIC $(shell python3 -m pybind11 --includes)
-NVCC_LINK_OPTS = -gencode arch=compute_80,code=sm_80 -O3 -std=c++11 --compiler-options -fPIC $(shell python3 -m pybind11 --includes)
+NVCC_SHR_OPTS = -gencode arch=compute_${COMPUTE_CAPABILITY},code=sm_${COMPUTE_CAPABILITY} -shared -O3 -std=c++11 --compiler-options -fPIC $(shell python3 -m pybind11 --includes) 
+NVCC_OPTS = -gencode arch=compute_${COMPUTE_CAPABILITY},code=sm_${COMPUTE_CAPABILITY} -O3 -std=c++11 --compiler-options -fPIC $(shell python3 -m pybind11 --includes)
+NVCC_LINK_OPTS = -gencode arch=compute_${COMPUTE_CAPABILITY},code=sm_${COMPUTE_CAPABILITY} -O3 -std=c++11 --compiler-options -fPIC $(shell python3 -m pybind11 --includes)
 NVCC_INC = -Iinclude/ -Iextern/
+
+.PHONY: clean test
 
 bin/test: bin/test.o lib/example.so bin/config.o
 	$(NVCC) $(NVCC_LINK_OPTS) $(NVCC_INC) --library-path=lib -Llib/example -lpython3.10 -o bin/test bin/test.o lib/example.so bin/config.o
@@ -31,4 +34,8 @@ bin/config.o: src/config.cu
 	$(NVCC) $(NVCC_OPTS) $(NVCC_INC) -c src/config.cu -o $@
 
 clean:
-	rm bin/*o lib/*o bin/test.o
+	rm bin/*o lib/*o bin/test *.log
+
+test:
+	python3 test.py > py_result.log
+	./bin/test > cu_result.log

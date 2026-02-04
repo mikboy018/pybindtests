@@ -12,13 +12,12 @@ args load_json_config(std::string filepath){
     a.firstVal = data.at("firstVal");
     a.secondVal = data.at("secondVal");
     std::string ltype = data.at("launchType");
-    if(strcmp(ltype.c_str(),"DEFAULT")==0){
-        a.ltype = DEFAULT;
-    }else if(strcmp(ltype.c_str(),"H_GRAPH")==0){
-        a.ltype = H_GRAPH;
-    }else if(strcmp(ltype.c_str(),"D_GRAPH")==0){
-        a.ltype = D_GRAPH;
+    if(strcmp(ltype.c_str(),"STANDARD")==0){
+        a.ltype = LAUNCH_TYPE::STANDARD;
+    }else if(strcmp(ltype.c_str(),"GRAPH")==0){
+        a.ltype = LAUNCH_TYPE::GRAPH;
     }
+    a.logfile = data.at("logfile");
 
     return a;
 }
@@ -29,9 +28,10 @@ args load_args(int argc, char * argv[]){
     a.n = 1500;
     a.threads = 256;
     a.blocks = 8;
-    a.firstVal = 1.0f;
-    a.secondVal = 1.0f;
-    a.ltype = DEFAULT;
+    a.firstVal = 1.0;
+    a.secondVal = 1.0;
+    a.ltype = LAUNCH_TYPE::STANDARD;
+    a.logfile = "cu.log";
 
     bool json_config = false;
 
@@ -64,14 +64,15 @@ args load_args(int argc, char * argv[]){
             }else if(strcmp(argv[i],"secondVal")==0){
                 a.secondVal = std::stof(argv[i+1]);
                 ++i;
+            }else if(strcmp(argv[i],"logfile")==0){
+                ++i;
+                a.logfile = argv[i];
             }else if(strcmp(argv[i],"launchType")==0){
                 ++i;
-                if(strcmp(argv[i],"DEFAULT")==0){
-                    a.ltype = DEFAULT;
-                }else if(strcmp(argv[i],"H_GRAPH")==0){
-                    a.ltype = H_GRAPH;
-                }else if(strcmp(argv[i],"D_GRAPH")==0){
-                    a.ltype = D_GRAPH;
+                if(strcmp(argv[i],"STANDARD")==0){
+                    a.ltype = STANDARD;
+                }else if(strcmp(argv[i],"GRAPH")==0){
+                    a.ltype = GRAPH;
                 }
             }
         }

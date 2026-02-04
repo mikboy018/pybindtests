@@ -36,7 +36,14 @@ def load_args(argv)->dict:
 if __name__ == '__main__':
 
     args = load_args(sys.argv)
-    devdata = example.device_mgr(args["n"],args["launchType"],args['threads'],args['blocks'],args['firstVal'],args['secondVal'],args['n_iter'],args['logfile'])
+    devdata = example.device_mgr(args["n"],
+                                 args["launchType"],
+                                 args['threads'],
+                                 args['blocks'],
+                                 args['firstVal'],
+                                 args['secondVal'],
+                                 args['n_iter'],
+                                 args['logfile'])
     devdata.ray_ops()
     h_out = devdata.getResults()
     print(args)

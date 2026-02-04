@@ -13,3 +13,5 @@ Where Compute Capability depends on GPU. Pascal - 60 or 61; Turing - 70 or 75; A
 This will generate log files for python & cuda source results.
 
 Coming soon: Documentation/Jupyter Notebooks for more interactive examples
+
+Uses [nlohmann/json](https://github.com/nlohmann/json) for ingesting JSON-formatted arguments. MIT License.
